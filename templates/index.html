@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>RCBinator</title>
+  </head>
+  <body>
+    <h1>RCBinator: IPL Playoff Chances</h1>
+    <form action="/myteam" method="POST">
+      <h3>My Team</h3>
+      <label for="team_name">Enter your team name:</label>
+      <input type="text" id="team_name" name="team_name">
+      <br>
+      <input type="submit" value="Submit">
+    </form>
+    {% if myteam_probability is not none and myteam_probability is not undefined %}
+        <h2>Probability of {{ team_name }} reaching the playoffs: {{ myteam_probability|round(2) }}%</h2>
+        <h3>Example outcome:</h3>
+        <p>Matches: {{ op0 }}</p>
+        <p>Points table: {{ ot0 }}</p>
+    {% endif %}
+
+    <form action="/allteams" method="POST">
+      <h3>All Teams</h3>
+      <input type="submit" value="Submit">
+    </form>
+    {% if allteams_probabilities is not none and allteams_probabilities is not undefined %}
+        <h2>Playoff Probabilities for All Teams:</h2>
+        <ul>
+        {% for team, probability in allteams_probabilities.items() %}
+            <li>{{ team }}: {{ probability|round(2) }}%</li>
+        {% endfor %}
+        </ul>
+    {% endif %}
+  </body>
+</html>
+
