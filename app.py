@@ -59,8 +59,10 @@ def main():
             col1.metric("Top 4 Chances", f"{top_4:.2f}%")
             col2.metric("Top 2 Chances", f"{top_2:.2f}%")
             
-            tab1, tab2 = st.tabs(["Prediction Table", "Points Table"])
             st.markdown("Prediction & Points table are shown for top 4 chances")
+            
+            tab1, tab2 = st.tabs(["Prediction Table", "Points Table"])
+            
             with tab1:
                 if not pred_match_outcomes:
                     st.markdown("No data available")
