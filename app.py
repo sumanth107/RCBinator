@@ -9,12 +9,17 @@ teams = ["CSK", "DC", "GT", "MI", "PBSK", "RR", "RCB", "SRH", "KKR", "LSG"]
 button_state = {label: False for label in teams}
 
 
+st.set_page_config(
+        page_title="RCBinator",
+        page_icon="🏆",  # Replace this with your desired icon emoji or path to an icon image
+        layout="centered",  # Optional: Set the layout style (wide, center, or fullscreen)
+    )
+
 def main():
     st.title("RCBinator: IPL Playoff Chances 🏏")
 
-    st.markdown("Choose Your Team 🏏")
     selected_tag = None
-    selected_tag = st.selectbox("Select a tag:", teams)
+    selected_tag = st.selectbox("Choose Your Team 🏏", teams)
 
 
 
@@ -72,6 +77,11 @@ def main():
                     points_table += f"| <span style='color: {color};'>{team:<5} </span> | {'14':<5} | {points//2:<5} | {14 - points//2:<5}  | {points:<5} |\n"
 
                 st.markdown(points_table, unsafe_allow_html=True)
+                
+            
+
+        footer_note = get_footer_note()
+        st.markdown(footer_note, unsafe_allow_html=True)
         # for i, pred_match_outcome in enumerate(pred_match_outcomes):
         #     st.markdown(f"Match {i+1}: {pred_match_outcome[0]} vs. {pred_match_outcome[1]}")
 
@@ -84,6 +94,15 @@ def get_points_table_header():
     points_table = "| Team | Played | Won | Lost | Points |\n|:----:|:------:|:---:|:----:|:------:|\n"
 
     return points_table
+
+def get_footer_note():
+    footer_note = """
+        <div style="text-align: left; bottom: 0; width: 100%; marginTop: 50px">
+        Made by <a href="https://github.com/sumanth107" target="_blank">Sumanth</a> & <a href="https://github.com/jaya-shankar" target="_blank">Jaya Shankar</a>
+        </div>
+    """
+    return footer_note
+
 def get_vs_text(teams):
     team1, team2 = teams
     name1, logo1, color1 = get_team_name_logo(team1)
@@ -91,25 +110,6 @@ def get_vs_text(teams):
     
     return f"{name1} vs. {name2}"
 
-# def get_vs_text(teams):
-#     team1, team2 = teams
-#     image1 = f"assets/logos/{team1.lower()}.png"
-#     image2 = f"assets/logos/{team2.lower()}.png"
-    
-#     # Construct the HTML string to display the images alongside the text
-#     # You can adjust the style (width, height) of the images as needed
-#     vs_text = f"""
-#     <div style="display: flex; align-items: center;">
-#         <img src="{image1}" style="width: 30px; height: 30px; margin-right: 5px;">
-#         <span style="font-weight: bold;">{team1}</span>
-#         <span> vs. </span>
-#         <span style="font-weight: bold;">{team2}</span>
-#         <img src="{image2}" style="width: 30px; height: 30px; margin-left: 5px;">
-#     </div>
-#     """
-    
-#     # Return the HTML string
-#     return vs_text
 def get_team_name_logo(team):
     team_name_dic = {
         "CSK": "Chennai Super Kings",
@@ -139,7 +139,7 @@ def get_team_name_logo(team):
     
     return team_name_dic[team], f"assets/logos/{team.lower()}.png", team_colors[team]
     
-    
+
 
 def style_buttons():
     st.markdown(
