@@ -127,6 +127,8 @@ def MyTeam(team, for_position = 4):
     #     print(ot[i])
     #     print("-----------------------------------------")
     # print("Chance of favorable outcome :", 100 * len(op) / j, "%")
+    if len(op) == 0 or len(ot) == 0:
+        return 100 * len(op) / j, None,None
     return 100 * len(op) / j, op[0], ot[0]
 
 

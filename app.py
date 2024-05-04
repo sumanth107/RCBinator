@@ -60,23 +60,29 @@ def main():
             col2.metric("Top 2 Chances", f"{top_2:.2f}%")
             
             tab1, tab2 = st.tabs(["Prediction Table", "Points Table"])
-
+            st.markdown("Prediction & Points table are shown for top 4 chances")
             with tab1:
-                prediction_table = get_prediction_table_header()
-                for i, pred_match_outcome  in enumerate(pred_match_outcomes):
-                    
-                    winner, logo, color = get_team_name_logo(pred_match_outcome[1])
-                    # Adjust the spaces between columns to control the width of the middle column
-                    prediction_table += f"| {i+1:<9} | {get_vs_text(pred_match_outcome[0]):<26} | <span style='color: {color};'>{pred_match_outcome[1]:<17} </span> |\n"
+                if not pred_match_outcomes:
+                    st.markdown("No data available")
+                else:
+                    prediction_table = get_prediction_table_header()
+                    for i, pred_match_outcome  in enumerate(pred_match_outcomes):
+                        
+                        winner, logo, color = get_team_name_logo(pred_match_outcome[1])
+                        # Adjust the spaces between columns to control the width of the middle column
+                        prediction_table += f"| {i+1:<9} | {get_vs_text(pred_match_outcome[0]):<26} | <span style='color: {color};'>{pred_match_outcome[1]:<17} </span> |\n"
 
-                st.markdown(prediction_table, unsafe_allow_html=True)
+                    st.markdown(prediction_table, unsafe_allow_html=True)
             with tab2:
-                points_table = get_points_table_header()
-                for team, points in pred_points_table.items():
-                    team_name, logo, color = get_team_name_logo(team)
-                    points_table += f"| <span style='color: {color};'>{team:<5} </span> | {'14':<5} | {points//2:<5} | {14 - points//2:<5}  | {points:<5} |\n"
+                if not pred_match_outcomes:
+                    st.markdown("No data available")
+                else:
+                    points_table = get_points_table_header()
+                    for team, points in pred_points_table.items():
+                        team_name, logo, color = get_team_name_logo(team)
+                        points_table += f"| <span style='color: {color};'>{team:<5} </span> | {'14':<5} | {points//2:<5} | {14 - points//2:<5}  | {points:<5} |\n"
 
-                st.markdown(points_table, unsafe_allow_html=True)
+                    st.markdown(points_table, unsafe_allow_html=True)
                 
             
 
