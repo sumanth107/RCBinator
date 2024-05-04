@@ -3,7 +3,7 @@ from ipl_helper import MyTeam, AllTeams
 import concurrent.futures
 
 
-teams = ["CSK", "DC", "GT", "MI", "PBSK", "RR", "RCB", "SRH", "KKR", "LSG"]
+teams = ["RCB", "DC", "GT", "MI", "PBSK", "RR", "CSK", "SRH", "KKR", "LSG"]
 
 
 button_state = {label: False for label in teams}
