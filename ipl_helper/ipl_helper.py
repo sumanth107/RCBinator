@@ -5,6 +5,7 @@
 import requests
 from bs4 import BeautifulSoup
 import random
+import re
 
 def get_ipl_page_url():
     base_url = "https://www.cricbuzz.com"
@@ -63,6 +64,7 @@ def get_points_table():
     table = [''.join([word[0] for word in x.split()]) for x in table]
     table = [x.replace('SH', 'SRH') for x in table]
     table = [x.replace('PK', 'PBSK') for x in table]
+    table = [re.sub(r'[^a-zA-Z]', '', text) for text in table]
     points = [x.get_text() for x in teams.find_all('td', class_='cb-srs-pnts-td')][5::7]
     points = [int(x) for x in points]
 
