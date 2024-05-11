@@ -120,7 +120,6 @@ def MyTeam(team, for_position = 4):
     max_num = int(''.join('1' for _ in range(no_remaining_matches)),base=2) + 1
     outcome = 0
     while outcome < max_num:
-        print(outcome)
         poss_outcomes = bin(outcome)[2:]
         poss_outcomes = '0' * (no_remaining_matches - len(poss_outcomes)) + poss_outcomes
         poss_outcomes = [int(o) for o in poss_outcomes]
