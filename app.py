@@ -59,7 +59,7 @@ def main():
             col1.metric("Top 4 Chances", f"{top_4:.2f}%")
             col2.metric("Top 2 Chances", f"{top_2:.2f}%")
             
-            st.markdown("Prediction & Points table are shown for top 4 chances")
+            st.markdown("Prediction & Points table are shown for top 4 chances with an consideration of atleast ±0.05 change in NRR per match")
             
             tab1, tab2 = st.tabs(["Prediction Table", "Points Table"])
             
@@ -81,8 +81,9 @@ def main():
                 else:
                     points_table = get_points_table_header()
                     for team, points in pred_points_table.items():
+                        points,nrr = points
                         team_name, logo, color = get_team_name_logo(team)
-                        points_table += f"| <span style='color: {color};'>{team:<5} </span> | {'14':<5} | {points//2:<5} | {14 - points//2:<5}  | {points:<5} |\n"
+                        points_table += f"| <span style='color: {color};'>{team:<5} </span> | {'14':<5} | {points//2:<5} | {14 - points//2:<5}  | {points:<5} | {round(nrr,3):<5} |\n"
 
                     st.markdown(points_table, unsafe_allow_html=True)
                 
@@ -99,7 +100,7 @@ def get_prediction_table_header():
     return prediction_table
 
 def get_points_table_header():
-    points_table = "| Team | Played | Won | Lost | Points |\n|:----:|:------:|:---:|:----:|:------:|\n"
+    points_table = "| Team | Played | Won | Lost | Points | NRR |\n|:----:|:------:|:---:|:----:|:------:|:------:|\n"
 
     return points_table
 

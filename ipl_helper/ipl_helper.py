@@ -6,6 +6,7 @@ import requests
 from bs4 import BeautifulSoup
 import random
 import re
+import copy
 
 def get_ipl_page_url():
     base_url = "https://www.cricbuzz.com"
@@ -66,10 +67,14 @@ def get_points_table():
     table = [x.replace('PK', 'PBSK') for x in table]
     table = [re.sub(r'[^a-zA-Z]', '', text) for text in table]
     points = [x.get_text() for x in teams.find_all('td', class_='cb-srs-pnts-td')][5::7]
+    nrr = [x.get_text() for x in teams.find_all('td', class_='cb-srs-pnts-td')][6::7]
+
     points = [int(x) for x in points]
-
-    points_table = dict(zip(table, points))
-
+    nrr = [float(x) for x in nrr]
+    points_table = {}
+    for team,pts,nrr in zip(table, points, nrr):
+        points_table[team] = [pts,nrr]
+    
     return points_table
 
 
@@ -110,27 +115,37 @@ def MyTeam(team, for_position = 4):
     S = get_ipl_schedule()[matches_done:]
     op, ot = [], []
     j = 0
-    while j < 10 ** 4:
+    no_remaining_matches = len(S)
+
+    max_num = int(''.join('1' for _ in range(no_remaining_matches)),base=2) + 1
+    outcome = 0
+    while outcome < max_num:
+        print(outcome)
+        poss_outcomes = bin(outcome)[2:]
+        poss_outcomes = '0' * (no_remaining_matches - len(poss_outcomes)) + poss_outcomes
+        poss_outcomes = [int(o) for o in poss_outcomes]
         P = []
-        T_temp = T.copy()
-        for x in S:
-            i = random.randint(0, 1)
-            T_temp[x[i]] += 2
+        T_temp = copy.deepcopy(T)
+        for x,i in zip(S, poss_outcomes):
+            T_temp[x[i]][0] += 2
+            T_temp[x[i]][1] += 0.05
+            j = (i+1)%2
+            T_temp[x[j]][1] -= 0.05
             P.append([x, x[i]])
         l_temp = sorted(list(T_temp.values()), reverse=True)
 
-        if T_temp[team] >= l_temp[for_position-1]:
+        if T_temp[team][0] >= l_temp[for_position-1][0] and T_temp[team][1] >= l_temp[for_position-1][1]:
             if P not in op:
                 op.append(P)
-                ot.append(dict(sorted(T_temp.items(), key=lambda item: item[1], reverse=True)))
-        j += 1
+                ot.append(dict(sorted(T_temp.items(), key=lambda item:  (item[1][0], item[1][1]), reverse=True)))
+        outcome += 1
     # for i in range(2):
     #     print(op[i])
     #     print(ot[i])
     #     print("-----------------------------------------")
     # print("Chance of favorable outcome :", 100 * len(op) / j, "%")
     if len(op) == 0 or len(ot) == 0:
-        return 100 * len(op) / j, None,None
-    return 100 * len(op) / j, op[0], ot[0]
+        return 100 * len(op) / outcome, None,None
+    return 100 * len(op) / outcome, op[0], ot[0]
 
 
