@@ -46,5 +46,5 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 ## Acknowledgments
 
-- The current IPL data is being scrapped from cricbuzz.
+- The current IPL data is being scrapped from [cricbuzz](https://www.cricbuzz.com/).
 

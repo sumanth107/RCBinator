@@ -2,80 +2,13 @@
 # Date: 04-29-2023
 # RCBinator
 
-import requests
-from bs4 import BeautifulSoup
 import random
-import re
+import numpy as np
 import copy
+import streamlit as st
 
-def get_ipl_page_url():
-    base_url = "https://www.cricbuzz.com"
-    series_url = base_url + "/cricket-series"
-    response = requests.get(series_url)
-    soup = BeautifulSoup(response.text, 'html.parser')
-    
-    ipl_page_url = soup.find('a', title='Indian T20 League 2024')['href']
-    if not ipl_page_url:
-        return None
-    ipl_page_url = base_url + ipl_page_url
-    return ipl_page_url
+from ipl_helper.cricbuzz_scraper import get_ipl_schedule, get_points_table, matches_played
 
-def get_abbreviations(team_names):
-    abbreviations = []
-    for name in team_names:
-        abbreviation = ''.join([word[0] for word in name.split()])
-        if abbreviation == 'SH':
-            abbreviation = 'SRH'
-        elif abbreviation == 'PK':
-            abbreviation = 'PBSK'
-        abbreviations.append(abbreviation)
-    return abbreviations
-
-def matches_played():
-    url = get_ipl_page_url()  + '/matches'
-    response = requests.get(url)
-    soup = BeautifulSoup(response.text, 'html.parser')
-    matches = soup.find_all('div', class_='cb-series-matches')
-    schedule = [x.get_text() for x in matches]
-    return sum([1 for x in schedule if 'won' in x])
-
-
-def get_ipl_schedule():
-    url = get_ipl_page_url()  + '/matches'
-    response = requests.get(url)
-    soup = BeautifulSoup(response.text, 'html.parser')
-    matches = soup.find_all('div', class_='cb-series-matches')
-    schedule = [x.get_text() for x in matches]
-    schedule = [x.split(',')[0].strip() for x in schedule]
-    schedule = [list(map(lambda x: x.strip(), x.split('vs'))) for x in schedule]
-    schedule = [get_abbreviations(x) for x in schedule][:-4]
-
-    return schedule
-
-get_ipl_schedule()
-
-
-def get_points_table():
-    url = get_ipl_page_url()  + '/points-table'
-    response = requests.get(url)
-    soup = BeautifulSoup(response.text, 'html.parser')
-
-    teams = soup.find('table', class_='table cb-srs-pnts')
-    table = [x.get_text() for x in teams.find_all('td', class_='cb-srs-pnts-name')]
-    table = [''.join([word[0] for word in x.split()]) for x in table]
-    table = [x.replace('SH', 'SRH') for x in table]
-    table = [x.replace('PK', 'PBSK') for x in table]
-    table = [re.sub(r'[^a-zA-Z]', '', text) for text in table]
-    points = [x.get_text() for x in teams.find_all('td', class_='cb-srs-pnts-td')][5::7]
-    nrr = [x.get_text() for x in teams.find_all('td', class_='cb-srs-pnts-td')][6::7]
-
-    points = [int(x) for x in points]
-    nrr = [float(x) for x in nrr]
-    points_table = {}
-    for team,pts,nrr in zip(table, points, nrr):
-        points_table[team] = [pts,nrr]
-    
-    return points_table
 
 
 def IPL(team):
@@ -109,42 +42,141 @@ def AllTeams():
     return probabilities
 
 
-def MyTeam(team, for_position = 4):
-    matches_done = matches_played()
-    T = get_points_table()
-    S = get_ipl_schedule()[matches_done:]
-    op, ot = [], []
-    j = 0
-    no_remaining_matches = len(S)
 
-    max_num = int(''.join('1' for _ in range(no_remaining_matches)),base=2) + 1
-    outcome = 0
-    while outcome < max_num:
-        poss_outcomes = bin(outcome)[2:]
-        poss_outcomes = '0' * (no_remaining_matches - len(poss_outcomes)) + poss_outcomes
-        poss_outcomes = [int(o) for o in poss_outcomes]
-        P = []
-        T_temp = copy.deepcopy(T)
-        for x,i in zip(S, poss_outcomes):
-            T_temp[x[i]][0] += 2
-            T_temp[x[i]][1] += 0.05
-            j = (i+1)%2
-            T_temp[x[j]][1] -= 0.05
-            P.append([x, x[i]])
-        l_temp = sorted(list(T_temp.values()), reverse=True)
+def MyTeam(team,T, matches_done , S, for_position,simulations=100_000):
+    def calculate_strength(team_data):
+        """Points dominate, NRR as minor tiebreaker"""
+        points, nrr = team_data
+        return max(points + nrr, 1) # Now points dominate (e.g., 18 + 1.2 = 19.2)
 
-        if T_temp[team][0] >= l_temp[for_position-1][0] and T_temp[team][1] >= l_temp[for_position-1][1]:
-            if P not in op:
-                op.append(P)
-                ot.append(dict(sorted(T_temp.items(), key=lambda item:  (item[1][0], item[1][1]), reverse=True)))
-        outcome += 1
-    # for i in range(2):
-    #     print(op[i])
-    #     print(ot[i])
-    #     print("-----------------------------------------")
-    # print("Chance of favorable outcome :", 100 * len(op) / j, "%")
-    if len(op) == 0 or len(ot) == 0:
-        return 100 * len(op) / outcome, None,None
-    return 100 * len(op) / outcome, op[0], ot[0]
+    def get_team_position(table, team_name):
+        sorted_teams = sorted(table.values(), key=lambda x: (-x[0], -x[1]))
+        for pos, t in enumerate(sorted_teams, 1):
+            if (t[0], t[1]) == (table[team_name][0], table[team_name][1]):
+                return pos
+        return len(sorted_teams)
 
+    progress_bar = st.progress(0)
+    status_text = st.empty()
+    no_remaining = len(S)
 
+    if no_remaining == 0:
+        pos = get_team_position(T, team)
+        return (100.0 if pos <= for_position else 0.0, [], [])
+
+    # Precompute match probabilities
+    match_probs = []
+    for match in S:
+        team_a, team_b = match
+        strength_a = calculate_strength(T[team_a])
+        strength_b = calculate_strength(T[team_b])
+        prob_a = strength_a / (strength_a + strength_b)
+        match_probs.append(prob_a)
+
+    # Exhaustive search for <22 matches (weighted)
+    if no_remaining < 22:
+        total_outcomes = 1 << no_remaining
+        success = 0.0
+        example_out = None
+        example_tab = None
+
+        for outcome in range(total_outcomes):
+            temp_T = copy.deepcopy(T)
+            scenario = []
+            scenario_prob = 1.0  # Track probability of this outcome
+            
+            for match_idx in range(no_remaining):
+                team_a, team_b = S[match_idx]
+                bit_pos = no_remaining - 1 - match_idx
+                result = (outcome >> bit_pos) & 1
+                
+                # Update probability for this outcome
+                if result == 0:
+                    scenario_prob *= match_probs[match_idx]
+                    winner = team_a
+                else:
+                    scenario_prob *= (1 - match_probs[match_idx])
+                    winner = team_b
+                
+                # Update table
+                temp_T[winner][0] += 2
+                temp_T[winner][1] += 0.05
+                loser = team_b if result == 0 else team_a
+                temp_T[loser][1] -= 0.05
+                scenario.append(((team_a, team_b), winner))
+
+            # Check qualification
+            sorted_teams = sorted(temp_T.values(), key=lambda x: (-x[0], -x[1]))
+            cutoff = sorted_teams[for_position-1] if len(sorted_teams) >= for_position else (0, 0)
+            team_entry = temp_T[team]
+            
+            if (team_entry[0] > cutoff[0]) or (team_entry[0] == cutoff[0] and team_entry[1] >= cutoff[1]):
+                success += scenario_prob
+                if not example_out:
+                    example_out = scenario
+                    example_tab = dict(sorted(temp_T.items(), key=lambda x: (-x[1][0], -x[1][1])))
+
+        return (success * 100, example_out, example_tab)
+
+    # Monte Carlo for ≥22 matches
+    else:
+        teams = list(T.keys())
+        team_idx = {t: i for i, t in enumerate(teams)}
+        target_i = team_idx[team]
+        matches = [(team_idx[m[0]], team_idx[m[1]]) for m in S]
+        num_matches = len(matches)
+
+        points = np.array([T[t][0] for t in teams], dtype=np.float32)
+        nrr = np.array([T[t][1] for t in teams], dtype=np.float32)
+        samples = simulations
+
+        # Generate outcomes using precomputed probabilities
+        outcomes = np.random.binomial(1, match_probs, size=(samples, num_matches))
+
+        pt = np.tile(points, (samples, 1))
+        nr = np.tile(nrr, (samples, 1))
+
+        for m_idx, (a, b) in enumerate(matches):
+            a_wins = outcomes[:, m_idx].astype(bool)
+            pt[a_wins, a] += 2
+            nr[a_wins, a] += 0.05
+            nr[a_wins, b] -= 0.05
+            pt[~a_wins, b] += 2
+            nr[~a_wins, b] += 0.05
+            nr[~a_wins, a] -= 0.05
+
+        # Calculate rankings
+        composite = pt * 1000 + nr  # Points dominate by 1000:1 ratio
+        rankings = np.argsort(-composite, axis=1)
+        positions = np.argmax(rankings == target_i, axis=1)
+        success_mask = positions < for_position
+        success_count = np.sum(success_mask)
+
+        # Example outcome
+        example_out, example_tab = None, None
+        if success_count > 0:
+            idx = np.where(success_mask)[0][0]
+            pt_ex = points.copy()
+            nr_ex = nrr.copy()
+            scenario = []
+            
+            for m_idx, (a, b) in enumerate(matches):
+                result = outcomes[idx, m_idx]
+                winner = teams[a] if result else teams[b]
+                scenario.append(((teams[a], teams[b]), winner))
+                
+                if result:
+                    pt_ex[a] += 2
+                    nr_ex[a] += 0.05
+                    nr_ex[b] -= 0.05
+                else:
+                    pt_ex[b] += 2
+                    nr_ex[b] += 0.05
+                    nr_ex[a] -= 0.05
+
+            sorted_t = sorted(zip(pt_ex, nr_ex, teams), 
+                            key=lambda x: (-x[0], -x[1]))
+            example_tab = {t: (float(p), float(n)) for p, n, t in sorted_t}
+            example_out = scenario
+
+        return (success_count / samples * 100, example_out, example_tab)

@@ -1,3 +1,4 @@
+from ipl_helper.cricbuzz_scraper import get_ipl_schedule, get_points_table, matches_played
 import streamlit as st
 from ipl_helper import MyTeam, AllTeams
 import concurrent.futures
@@ -20,8 +21,29 @@ def main():
 
     selected_tag = None
     selected_tag = st.selectbox("Choose Your Team 🏏", teams)
+    
+    matches_done = matches_played()
+    print(matches_done)
+    simulations = 0
+    if(matches_done < 50):
+        simulations_millions = st.slider(
+        "How many prediction runs? ( in Millions )",
+        0.1,  # Minimum value (0.1M = 100,000)
+        2.0,  # Maximum value (2.0M = 2,000,000)
+        0.1,  # Default value (0.1M = 100,000)
+        0.2,  # Step size (0.2M = 200,000)
+        format="%.1fM",  # Format as 0.1M, 0.3M, etc.
+        help="""More runs give more accurate predictions but take longer to calculate\n
+**(More runs = better accuracy)**
+- 0.3M (Standard)  
+- 0.1M (Quick Check)  
+- 2.0M (Ultra-Accurate) """
+        )
 
-
+        # Convert back to actual simulation count
+        simulations = int(simulations_millions * 1_000_000)
+    else:
+        st.success("The top 4 and top 2 chances are be predicted with all possible outcomes")
 
     # Display the buttons and handle their state
    
@@ -45,12 +67,18 @@ def main():
 
     if selected_tag:
         col1 , col2 = st.columns(2)
+        with st.spinner("Fetching latest data 🏏..."):
+            matches_done = matches_played()
+        
+            T = get_points_table()
+            S = get_ipl_schedule()[matches_done:]
         with st.spinner("Loading... Please wait while your team's data is being processed."):
             
             positions = [4, 2]
+            
             with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
                 
-                futures = [executor.submit(MyTeam, selected_tag, pos) for pos in positions]
+                futures = [executor.submit(MyTeam, selected_tag, T, matches_done, S,  pos, simulations) for pos in positions]
                 top_4, pred_match_outcomes, pred_points_table = futures[0].result()
                 top_2, pred_match_outcomes_2, pred_points_table_2 = futures[1].result()
                 
@@ -60,6 +88,20 @@ def main():
             col2.metric("Top 2 Chances", f"{top_2:.2f}%")
             
             st.markdown("Prediction & Points table are shown for top 4 chances with an consideration of atleast ±0.05 change in NRR per match")
+            
+            with st.expander("What's New? 🎉", expanded=False):
+                st.markdown("""
+                **Algorithm Improvements** 🤖:
+                - **Team Performance Weighting** 🏏  
+                  Predictions now consider *both points + net run rate* for realistic strength assessment
+                - **Dynamic Win Probabilities** ⚖️  
+                  No more 50-50 guesses – stronger teams get higher win chances
+
+                **Result Enhancements:**
+                - 📈 **NRR Precision**  
+                  ±0.05 NRR change per match now included
+                """)
+                st.caption("ℹ️ Updates apply to all new predictions")
             
             tab1, tab2 = st.tabs(["Prediction Table", "Points Table"])
             
