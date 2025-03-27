@@ -134,6 +134,7 @@ def MyTeam(team,T, matches_done , S, for_position,simulations=100_000):
         outcomes = np.random.binomial(1, match_probs, size=(samples, num_matches))
 
         pt = np.tile(points, (samples, 1))
+        pt[pt > 22] = 22  # Cap points
         nr = np.tile(nrr, (samples, 1))
 
         for m_idx, (a, b) in enumerate(matches):
