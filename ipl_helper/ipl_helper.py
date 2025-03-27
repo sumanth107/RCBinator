@@ -5,7 +5,6 @@
 import random
 import numpy as np
 import copy
-import streamlit as st
 
 from ipl_helper.cricbuzz_scraper import get_ipl_schedule, get_points_table, matches_played
 
@@ -56,8 +55,7 @@ def MyTeam(team,T, matches_done , S, for_position,simulations=100_000):
                 return pos
         return len(sorted_teams)
 
-    progress_bar = st.progress(0)
-    status_text = st.empty()
+    
     no_remaining = len(S)
 
     if no_remaining == 0:

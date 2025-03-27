@@ -23,7 +23,6 @@ def main():
     selected_tag = st.selectbox("Choose Your Team 🏏", teams)
     
     matches_done = matches_played()
-    print(matches_done)
     simulations = 0
     if(matches_done < 50):
         simulations_millions = st.slider(
