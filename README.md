@@ -1,51 +1,107 @@
-# RCBinator: IPL Playoff Chances
+# RCBinator: IPL Playoff Predictor 🏏
 
-RCBinator is a web application that calculates the playoff chances for each team in the Indian Premier League (IPL) based on the current points table and remaining matches. It uses a Monte Carlo simulation to estimate the probabilities of each team making it to the top 4.
+RCBinator is an interactive web application that calculates the playoff chances for teams in the Indian Premier League (IPL). The app uses advanced Monte Carlo simulations to predict qualification probabilities based on current standings, remaining matches, and team performance metrics.
 
-LIVE URL: https://rcbinator.streamlit.app/
-## Features
+### 🔴 [Live App: RCBinator on Streamlit](https://rcbinator.streamlit.app/)
 
-- Calculate the probability of a specific team reaching the playoffs
-- Calculate the probability of all teams reaching the playoffs
-- Display an example outcome of matches and points table for the specific team
+![RCBinator Screenshot](https://github.com/sumanth107/RCBinator/raw/main/assets/screenshot.png)
 
-## Getting Started
+## ✨ Key Features
+
+- **Team-Specific Experiences** - Custom UI themes and messaging based on team selection
+- **Advanced Predictions** - Weighted simulation model using points (60%), NRR (10%), and team form (30%)
+- **Multiple Visualizations** - Interactive charts, qualification paths, and prediction tables
+- **Real-time Calculations** - Live data scraping from Cricbuzz for up-to-date predictions
+- **Championship Probability** - Calculate not just playoff qualification but winning chances
+- **Detailed Explanations** - Clear insights about prediction methodology and match outcomes
+
+## 📊 Prediction Methodology
+
+RCBinator uses a sophisticated model to predict match outcomes:
+
+1. **Team Strength Calculation**
+   - Points Table Position (60% weight)
+   - Net Run Rate (10% weight)
+   - Recent Team Form (30% weight)
+   - Historical head-to-head records
+
+2. **Dynamic NRR Modeling**
+   - Different NRR changes (0.03-0.12) based on match context
+   - Factors in point difference between competing teams
+   - Random variation for realistic outcomes
+
+3. **Monte Carlo Simulations**
+   - Runs millions of simulations (configurable from 50k to 2M)
+   - More simulations = better accuracy (but longer calculation time)
+
+## 💻 Usage Guide
+
+1. **Select Your Team**: Choose your favorite IPL team
+2. **Set Simulation Count**: Higher counts give more accurate results
+3. **View Results**: Check playoff chances, top 2 probabilities, and championship odds
+4. **Explore Visualizations**: See points comparisons, paths to qualification, and more
+
+## 📱 UI/UX Features
+
+- **Team Theming** - Colors and styling change based on selected team
+- **Custom Messages** - Personalized content based on qualification probability
+   - Special RCB trolling messages (😂)
+   - Extra love for SRH supporters (🧡)
+- **Progressive Loading** - Results appear as they become available
+- **Responsive Design** - Works on mobile devices and desktops
+- **Interactive Charts** - Visualize playoff cutoffs and qualification scenarios
+
+## 🛠️ Installation for Development
 
 ### Prerequisites
 
-- Python 3.6 or higher
-- Flask
-- Requests
-- Beautiful Soup 4
+- Python 3.9 or higher
+- Streamlit
+- Pandas, Plotly, NumPy
 
-### Installation
+### Steps
 
-1. Clone the repository to your local machine:
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/sumanth107/RCBinator.git
+   cd RCBinator
+   ```
 
 2. Install the required packages:
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-4. Open your web browser and navigate to `http://127.0.0.1:5001`
+3. Run the application locally:
+   ```bash
+   streamlit run app.py
+   ```
 
-## Usage
+## 🚀 Deploying to Streamlit Cloud
 
-1. To calculate the probability of a specific team reaching the playoffs, enter the team name in the "My Team" section and click "Submit".
-2. To calculate the probability of all teams reaching the playoffs, click "Submit" in the "All Teams" section.
+1. Fork this repository to your GitHub account
+2. Go to [Streamlit Cloud](https://streamlit.io/cloud)
+3. Create a new app pointing to your fork
+4. Set the main file path to `app.py`
+5. Deploy and enjoy your own instance of RCBinator!
 
-## Contributing
+## 🤝 Contributing
 
-Contributions are welcome! If you would like to contribute, please follow these steps:
+Contributions are welcome! To contribute:
 
 1. Fork the repository
-2. Create a new branch (`git checkout -b your-feature-branch`)
-3. Commit your changes (`git commit -m 'Add some feature'`)
-4. Push to the branch (`git push origin your-feature-branch`)
-5. Create a new Pull Request
+2. Create a new branch (`git checkout -b feature/your-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/your-feature`)
+5. Open a Pull Request
 
-## License
+## 📄 License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
-## Acknowledgments
+## 🙏 Acknowledgments
 
-- The current IPL data is being scrapped from [cricbuzz](https://www.cricbuzz.com/).
+- IPL data is scraped from [Cricbuzz](https://www.cricbuzz.com/)
+- Fan psychology incorporated from actual cricket enthusiasts
+- Made with 🧡 by [Sumanth](https://github.com/sumanth107)
 
