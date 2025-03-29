@@ -14,7 +14,7 @@ RCBinator is an interactive web application that calculates the playoff chances 
 - **Championship Probability** - Calculate not just playoff qualification but winning chances
 - **Detailed Explanations** - Clear insights about prediction methodology and match outcomes
 
-## 📊 Prediction Methodology
+## Prediction Methodology
 
 RCBinator uses a sophisticated model to predict match outcomes:
 
@@ -33,7 +33,7 @@ RCBinator uses a sophisticated model to predict match outcomes:
    - Runs millions of simulations (configurable from 50k to 2M)
    - More simulations = better accuracy (but longer calculation time)
 
-## 🔬 Technical Deep Dive
+## Technical Deep Dive
 
 ### Team Strength Calculation Algorithm
 
@@ -42,15 +42,15 @@ The app uses a weighted formula to calculate team strength:
 ```python
 def calculate_strength(team_data, team_name):
     points, nrr = team_data
-    normalized_points = points / 28  # Normalize to 0-1 (max 28 points)
-    normalized_nrr = (nrr + 1.5) / 3  # Normalize NRR range
+    normalized_points = points / 28  
+    normalized_nrr = (nrr + 1.5) / 3  
     
     # Weighted combination (60% points, 10% NRR, 30% form)
     strength = (POINTS_WEIGHT * normalized_points) + 
               (NRR_WEIGHT * normalized_nrr) + 
               (FORM_WEIGHT * team_form[team_name])
     
-    return max(0.1, min(1.0, strength))  # Ensure value between 0.1-1.0
+    return max(0.1, min(1.0, strength))  
 ```
 
 This strength value ranges from 0.1 to 1.0 and represents a team's overall competitiveness. The formula prioritizes points (60%) as the most important factor, while also considering NRR (10%) and recent form (30%).
@@ -144,7 +144,7 @@ The simulation checks if a team's position is ≤ 4 after sorting all teams by p
 
 ```python
 # Calculate rankings with weighted points/NRR
-composite = pt * 1000 + nr  # Points dominate by 1000:1 ratio
+composite = pt * 1000 + nr  
 rankings = np.argsort(-composite, axis=1)
 positions = np.argmax(rankings == target_i, axis=1)
 success_mask = positions < for_position
@@ -177,16 +177,8 @@ def update_team_form(winner, loser):
 
 This creates realistic "hot streaks" and "slumps" that influence match outcomes in later rounds of the tournament.
 
-### Optimization Techniques
 
-Several optimizations improve performance:
-- Vectorized operations with NumPy for parallel processing
-- Precomputed NRR changes to reduce computation
-- Adaptive simulation approach based on remaining matches
-- Caching of intermediate results
-- Progressive loading of results as they become available
-
-## 💻 Usage Guide
+## Usage Guide
 
 1. **Select Your Team**: Choose your favorite IPL team
 2. **Set Simulation Count**: Higher counts give more accurate results
@@ -194,7 +186,7 @@ Several optimizations improve performance:
 4. **Explore Visualizations**: See points comparisons, paths to qualification, and more
 
 
-## 🛠️ Installation for Development
+## Installation for Development
 
 ### Prerequisites
 
@@ -220,7 +212,7 @@ Several optimizations improve performance:
    streamlit run app.py
    ```
 
-## 🚀 Deploying to Streamlit Cloud
+## Deploying to Streamlit Cloud
 
 1. Fork this repository to your GitHub account
 2. Go to [Streamlit Cloud](https://streamlit.io/cloud)
@@ -228,7 +220,7 @@ Several optimizations improve performance:
 4. Set the main file path to `app.py`
 5. Deploy and enjoy your own instance of RCBinator!
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! To contribute:
 
@@ -238,11 +230,11 @@ Contributions are welcome! To contribute:
 4. Push to the branch (`git push origin feature/your-feature`)
 5. Open a Pull Request
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - IPL data is scraped from [Cricbuzz](https://www.cricbuzz.com/)
 - Made with 🧡 by [Sumanth](https://github.com/sumanth107) and [Jaya Shankar](https://github.com/jaya-shankar)
