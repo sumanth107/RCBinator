@@ -92,6 +92,5 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 ## 🙏 Acknowledgments
 
 - IPL data is scraped from [Cricbuzz](https://www.cricbuzz.com/)
-- Fan psychology incorporated from actual cricket enthusiasts
 - Made with 🧡 by [Sumanth](https://github.com/sumanth107) and [Jaya Shankar](https://github.com/jaya-shankar)
 
