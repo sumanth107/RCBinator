@@ -115,7 +115,7 @@ The app uses two different approaches based on the number of remaining matches:
    - Percentage of simulations where team qualifies = qualification probability
 
 ```python
-# Monte Carlo implementation (simplified)
+# Monte Carlo implementation
 outcomes = np.random.binomial(1, match_probs, size=(samples, num_matches))
 
 # Process match outcomes
