@@ -1087,7 +1087,9 @@ def create_qualification_path(pred_match_outcomes, selected_team):
         if not other_important_matches:
             st.write("No other matches affecting qualification")
         else:
-            for i, (match, winner) in enumerate(other_important_matches[:5]):
+            # Show initial set of matches
+            initial_matches = min(5, len(other_important_matches))
+            for i, (match, winner) in enumerate(other_important_matches[:initial_matches]):
                 team1, team2 = match
                 
                 team1_name, _, team1_color = get_team_name_logo(team1)
@@ -1106,8 +1108,47 @@ def create_qualification_path(pred_match_outcomes, selected_team):
                 </div>
                 """, unsafe_allow_html=True)
             
-            if len(other_important_matches) > 5:
-                st.markdown(f"...and {len(other_important_matches) - 5} more matches")
+            # If there are more matches, create an expander with a scrollable container
+            if len(other_important_matches) > initial_matches:
+                remaining_matches = len(other_important_matches) - initial_matches
+                with st.expander(f"Show {remaining_matches} more important matches"):
+                    # Create a container with max height for scrolling
+                    st.markdown("""
+                    <style>
+                    .scrollable-container {
+                        max-height: 300px;
+                        overflow-y: auto;
+                        border-radius: 5px;
+                        padding-right: 10px;
+                    }
+                    </style>
+                    """, unsafe_allow_html=True)
+                    
+                    # Start a div for the scrollable container
+                    st.markdown("<div class='scrollable-container'>", unsafe_allow_html=True)
+                    
+                    # Add all the remaining matches
+                    for i, (match, winner) in enumerate(other_important_matches[initial_matches:]):
+                        team1, team2 = match
+                        
+                        team1_name, _, team1_color = get_team_name_logo(team1)
+                        team2_name, _, team2_color = get_team_name_logo(team2)
+                        winner_name, _, _ = get_team_name_logo(winner)
+                        
+                        st.markdown(f"""
+                        <div class='match-card other-match'>
+                            <div class='match-teams'>
+                                <span style='color: {team1_color};'>{team1}</span> vs 
+                                <span style='color: {team2_color};'>{team2}</span>
+                            </div>
+                            <div class='match-result'>
+                                Winner: <span style='font-weight: bold;'>{winner_name}</span>
+                            </div>
+                        </div>
+                        """, unsafe_allow_html=True)
+                    
+                    # Close the scrollable container div
+                    st.markdown("</div>", unsafe_allow_html=True)
     
     # Add explanation
     with st.expander("ℹ️ How the qualification path works", expanded=False):
