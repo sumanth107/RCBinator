@@ -4,7 +4,6 @@ RCBinator is an interactive web application that calculates the playoff chances 
 
 ### 🔴 [Live App: RCBinator on Streamlit](https://rcbinator.streamlit.app/)
 
-![RCBinator Screenshot](https://github.com/sumanth107/RCBinator/raw/main/assets/screenshot.png)
 
 ## ✨ Key Features
 
@@ -41,15 +40,6 @@ RCBinator uses a sophisticated model to predict match outcomes:
 3. **View Results**: Check playoff chances, top 2 probabilities, and championship odds
 4. **Explore Visualizations**: See points comparisons, paths to qualification, and more
 
-## 📱 UI/UX Features
-
-- **Team Theming** - Colors and styling change based on selected team
-- **Custom Messages** - Personalized content based on qualification probability
-   - Special RCB trolling messages (😂)
-   - Extra love for SRH supporters (🧡)
-- **Progressive Loading** - Results appear as they become available
-- **Responsive Design** - Works on mobile devices and desktops
-- **Interactive Charts** - Visualize playoff cutoffs and qualification scenarios
 
 ## 🛠️ Installation for Development
 
@@ -102,6 +92,4 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 ## 🙏 Acknowledgments
 
 - IPL data is scraped from [Cricbuzz](https://www.cricbuzz.com/)
-- Fan psychology incorporated from actual cricket enthusiasts
-- Made with 🧡 by [Sumanth](https://github.com/sumanth107)
 
