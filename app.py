@@ -541,7 +541,6 @@ def create_visualizations(pred_points_table, selected_team, view_mode="default")
     # Create a truly unique key using selected team and view mode
     # radio_key = f"viz_radio_{selected_team}_{view_mode}_{str(random.randint(1000, 9999))}"
     radio_key = f"viz_radio_{selected_team}_{view_mode}"
-    print("before: ", st.session_state["viz_option"])
     # Create options for different visualizations
     st.session_state["viz_option"] = st.radio(
         "Choose Visualization", 
@@ -550,7 +549,6 @@ def create_visualizations(pred_points_table, selected_team, view_mode="default")
         index=0 if st.session_state["viz_option"] == "Qualification Matrix" else 1,
         key=radio_key
     )
-    print(f"after: ", st.session_state["viz_option"])
     if st.session_state["viz_option"] == "Points Comparison":
         # Create a bar chart for points comparison
         st.subheader("Points Comparison")
