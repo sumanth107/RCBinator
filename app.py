@@ -945,7 +945,7 @@ def get_points_table_header():
 def get_footer_note():
     footer_note = """
         <div style="text-align: center; padding: 20px; background: rgba(0,0,0,0.2); border-radius: 10px; margin-top: 30px">
-        <p>Made with 🧡 by <a href="https://github.com/sumanth107" target="_blank" style="color: #8BC34A">Sumanth</a></p>
+        <p>Made with 🧡 by <a href="https://github.com/sumanth107" target="_blank" style="color: #8BC34A">Sumanth</a> and <a href="https://github.com/jaya-shankar" target="_blank" style="color: #8BC34A">Jaya Shankar</a></p>
         </div>
     """
     return footer_note
