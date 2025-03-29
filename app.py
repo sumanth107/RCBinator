@@ -1,15 +1,15 @@
 from ipl_helper.cricbuzz_scraper import get_ipl_schedule, get_points_table, matches_played
 import streamlit as st
-from ipl_helper import MyTeam, AllTeams
-import concurrent.futures
+from ipl_helper import MyTeam
 import pandas as pd
-import altair as alt
 import plotly.express as px
-import plotly.graph_objects as go
 import numpy as np
 import random
-from PIL import Image
-import os
+
+
+# Initialize session state for visualization option
+if "viz_option" not in st.session_state:
+    st.session_state["viz_option"] = "Points Comparison"
 
 teams = ["RCB", "DC", "GT", "MI", "PBSK", "RR", "CSK", "SRH", "KKR", "LSG"]
 
@@ -539,17 +539,19 @@ def create_visualizations(pred_points_table, selected_team, view_mode="default")
     df = pd.DataFrame(data)
     
     # Create a truly unique key using selected team and view mode
-    radio_key = f"viz_radio_{selected_team}_{view_mode}_{str(random.randint(1000, 9999))}"
-    
+    # radio_key = f"viz_radio_{selected_team}_{view_mode}_{str(random.randint(1000, 9999))}"
+    radio_key = f"viz_radio_{selected_team}_{view_mode}"
+    print("before: ", st.session_state["viz_option"])
     # Create options for different visualizations
-    viz_option = st.radio(
+    st.session_state["viz_option"] = st.radio(
         "Choose Visualization", 
-        ["Points Comparison", "Qualification Matrix"],
+        ["Qualification Matrix","Points Comparison"],
         horizontal=True,
+        index=0 if st.session_state["viz_option"] == "Qualification Matrix" else 1,
         key=radio_key
     )
-    
-    if viz_option == "Points Comparison":
+    print(f"after: ", st.session_state["viz_option"])
+    if st.session_state["viz_option"] == "Points Comparison":
         # Create a bar chart for points comparison
         st.subheader("Points Comparison")
         
@@ -605,7 +607,7 @@ def create_visualizations(pred_points_table, selected_team, view_mode="default")
                     font=dict(color=get_team_name_logo(team)[2], size=12, family="Arial Black")
                 )
         
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, use_container_width=True, key=f"points_comparison_chart-{team}-{view_mode}")
         
         # Explanation for visualization
         with st.expander("ℹ️ Understanding this chart", expanded=False):
@@ -687,7 +689,7 @@ def create_visualizations(pred_points_table, selected_team, view_mode="default")
             ]
         )
         
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, use_container_width=True, key=f"qualification_matrix_chart-{team}-{view_mode}")
         
         # Explanation for visualization
         with st.expander("ℹ️ Understanding this chart", expanded=False):
